@@ -1,7 +1,7 @@
-import { App } from "@slack/bolt";
+import { App } from '@slack/bolt';
 
 export function enableAll(app: App) {
-  if (process.env.SLACK_REQUEST_LOG_ENABLED === "1") {
+  if (process.env.SLACK_REQUEST_LOG_ENABLED === '1') {
     app.use(async (args: any) => {
       const copiedArgs = JSON.parse(JSON.stringify(args));
       copiedArgs.context.botToken = 'xoxb-***';
@@ -10,13 +10,9 @@ export function enableAll(app: App) {
       }
       copiedArgs.client = {};
       copiedArgs.logger = {};
-      args.logger.debug(
-        "Dumping request data for debugging...\n\n" +
-        JSON.stringify(copiedArgs, null, 2) +
-        "\n"
-      );
+      args.logger.debug('Dumping request data for debugging...\n\n' + JSON.stringify(copiedArgs, null, 2) + '\n');
       const result = await args.next();
-      args.logger.debug("next() call completed");
+      args.logger.debug('next() call completed');
       return result;
     });
   }

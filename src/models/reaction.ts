@@ -12,8 +12,8 @@ const ReactionSchema: Schema = new Schema({
   reward_id: { type: String, required: true },
   channel: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Channels'
-  }
+    ref: 'Channels',
+  },
 });
 
 export default mongoose.model<IReaction>('Reactions', ReactionSchema);

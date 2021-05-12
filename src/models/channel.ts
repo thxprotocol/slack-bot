@@ -14,8 +14,8 @@ const ChannelSchema: Schema = new Schema({
   members: { type: [String] },
   workspace: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Workspaces'
-  }
+    ref: 'Workspaces',
+  },
 });
 
 export default mongoose.model<IChannel>('Channels', ChannelSchema);

@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose'
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IWorkspace extends Document {
   id: string;
@@ -11,7 +11,7 @@ const WorkspaceSchema: Schema = new Schema({
   id: { type: String, required: true },
   client_id: { type: String },
   client_secret: { type: String },
-  access_token: { type: String }
-})
+  access_token: { type: String },
+});
 
-export default mongoose.model<IWorkspace>('Workspaces', WorkspaceSchema)
+export default mongoose.model<IWorkspace>('Workspaces', WorkspaceSchema);
