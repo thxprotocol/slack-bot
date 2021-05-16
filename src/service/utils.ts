@@ -16,3 +16,18 @@ export const createClient = (clientId: string, clientToken: string): AxiosInstan
 
   return client;
 };
+
+export const getClientWithAccess = (accessToken: string): AxiosInstance => {
+  const authorizationPayload = 'Bearer ' + accessToken;
+  const client = axios.create({
+    timeout: 60000,
+  });
+
+  client.interceptors.request.use(function (config) {
+    config.headers.Authorization = authorizationPayload;
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    return config;
+  });
+
+  return client;
+};

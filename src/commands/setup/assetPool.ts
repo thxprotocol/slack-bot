@@ -1,5 +1,5 @@
 import { Middleware, SlackCommandMiddlewareArgs } from '@slack/bolt';
-import setupWorkspaceView from '../../views/setupWorkspace';
+import setupAssetPoolView from '../../views/setupAssetPool';
 
 const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, body, command, client }) => {
   await ack();
@@ -13,16 +13,16 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, body, com
 
     await client.views.open({
       trigger_id: body.trigger_id,
-      view: setupWorkspaceView.buildView({ private_metadata }),
+      view: setupAssetPoolView.buildView({ private_metadata }),
     });
   } catch (error) {
     console.error(error);
   }
 };
 
-const setupWorkspaceCommand = {
-  name: '/setup-workspace',
+const setupAssetPool = {
+  name: '/setup-assetpool',
   listener,
 };
 
-export default setupWorkspaceCommand;
+export default setupAssetPool;

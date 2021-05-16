@@ -1,9 +1,9 @@
 import view from './view';
 import listener from './listener';
-import { SETUP_WORKSPACE } from './utils';
+import { EMOJI_ADD } from './utils';
 
 export default {
-  name: SETUP_WORKSPACE,
+  name: EMOJI_ADD,
   view,
   listener,
   buildView(data: any) {

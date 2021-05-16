@@ -1,27 +1,29 @@
+import { Middleware, SlackViewMiddlewareArgs } from '@slack/bolt';
 import Workspace from '../../models/workspace';
 import Channel from '../../models/channel';
 import Reaction from '../../models/reaction';
 import thx from '../../service/thx';
 
-const listener = async ({ ack, view, client }: any) => {
+const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client }) => {
   let channel_id;
   try {
     await ack();
 
-    channel_id = view.private_metadata;
-
+    const private_metadata = JSON.parse(view.private_metadata);
     const client_id = view.state.values.client_id_block.client_id.value;
     const client_secret = view.state.values.client_secret_block.client_secret.value;
     const workspace_id = view.team_id;
 
-    const access_token = await thx.getAccessToken(client_id, client_secret);
+    channel_id = private_metadata.channel_id;
+
+    const { access_token, access_token_expires_at } = await thx.getAccessToken(client_id, client_secret);
     if (!access_token) {
       throw new Error('Invalid credentials');
     }
 
     const workspace = await Workspace.findOneAndUpdate(
       { id: workspace_id },
-      { client_id, client_secret, access_token },
+      { client_id, client_secret, access_token, access_token_expires_at },
       { upsert: true },
     );
     if (!workspace) return;
