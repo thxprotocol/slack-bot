@@ -6,12 +6,12 @@ import User from '../../models/user';
 import thx from '../../service/thx';
 import { encryptString } from '../../utils';
 
-const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, client }) => {
+const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, context, client }) => {
   let channel;
   try {
     await ack();
 
-    const { channel_id, team_id: workspace_id, text, user_id } = command;
+    const { channel_id, text, user_id } = command;
     channel = channel_id;
 
     const [email, password] = text.split(' ');
@@ -33,19 +33,9 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
       return;
     }
 
-    const workspace = await Workspace.findOne({ id: workspace_id });
-    if (!workspace?.client_id || !workspace?.client_secret) {
-      await client.chat.postMessage({
-        channel,
-        text: 'Please setup Client ID and Client Token',
-      });
-
-      return;
-    }
-
     const user = await User.findOne({ uuid: user_id });
     if (!user) {
-      const { access_token } = await thx.getAccessToken(workspace.client_id, workspace.client_secret);
+      const { access_token } = await thx.getAccessToken(context.client_id, context.client_secret);
       if (!access_token) {
         await client.chat.postMessage({
           channel,
@@ -55,20 +45,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
         return;
       }
 
-      const channelModel = await Channel.findOne({
-        id: channel,
-      });
-
-      if (!channelModel?.pool_address) {
-        await client.chat.postMessage({
-          channel: channel_id,
-          text: 'Please setup Contract Address for your Channel first',
-        });
-
-        return;
-      }
-
-      const address = await thx.getWalletAddress(channelModel.pool_address, access_token, email, password);
+      const address = await thx.getWalletAddress(context.pool_address, access_token, email, password);
       if (!address) {
         await client.chat.postMessage({
           channel: channel_id,

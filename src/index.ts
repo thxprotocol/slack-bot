@@ -15,7 +15,8 @@ import walletCreateCommand from './commands/wallet/create';
 import walletLoginCommand from './commands/wallet/login';
 import walletUpdateCommand from './commands/wallet/update';
 import walletInfoCommand from './commands/wallet/info';
-import isAdminMiddleware from './middleware/isAdmin';
+import isAdmin from './middleware/isAdmin';
+import isWorkspaceSetup from './middleware/isWorkspaceSetup';
 
 setupDb();
 
@@ -29,10 +30,10 @@ const app = new App({
 customMiddleware.enableAll(app);
 
 // commands
-app.command(setupWorkspaceCommand.name, isAdminMiddleware, setupWorkspaceCommand.listener);
-app.command(setupAssetPoolCommand.name, isAdminMiddleware, setupAssetPoolCommand.listener);
-app.command(emojiAddCommand.name, isAdminMiddleware, emojiAddCommand.listener);
-app.command(walletCreateCommand.name, walletCreateCommand.listener);
+app.command(setupWorkspaceCommand.name, isAdmin, setupWorkspaceCommand.listener);
+app.command(setupAssetPoolCommand.name, isAdmin, setupAssetPoolCommand.listener);
+app.command(emojiAddCommand.name, isAdmin, emojiAddCommand.listener);
+app.command(walletCreateCommand.name, isWorkspaceSetup, walletCreateCommand.listener);
 app.command(walletUpdateCommand.name, walletUpdateCommand.listener);
 app.command(walletLoginCommand.name, walletLoginCommand.listener);
 app.command(walletInfoCommand.name, walletInfoCommand.listener);

@@ -1,7 +1,7 @@
 import { Middleware, SlackCommandMiddlewareArgs } from '@slack/bolt';
 import Channel from '../models/channel';
 
-const isAdminMiddleware: Middleware<SlackCommandMiddlewareArgs> = async ({ command, client, next }) => {
+const isChannelSetup: Middleware<SlackCommandMiddlewareArgs> = async ({ command, client, context, next }) => {
   const { channel_id } = command;
 
   const channel = await Channel.findOne({
@@ -17,7 +17,9 @@ const isAdminMiddleware: Middleware<SlackCommandMiddlewareArgs> = async ({ comma
     return;
   }
 
+  context.pool_address = channel.pool_address;
+
   if (next) await next();
 };
 
-export default isAdminMiddleware;
+export default isChannelSetup;
