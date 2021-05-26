@@ -1,73 +1,44 @@
 import { Middleware, SlackCommandMiddlewareArgs } from '@slack/bolt';
 import { EMAIL_REGEX, SECRET } from '../../constants';
-import Workspace from '../../models/workspace';
-import Channel from '../../models/channel';
-import User from '../../models/user';
 import thx from '../../service/thx';
-import { decryptString } from '../../utils';
+import { decryptString } from '../../utils/crypto';
 
-const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, client }) => {
-  let channel;
+const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, client, context }) => {
   try {
     await ack();
 
-    const { channel_id, team_id: workspace_id, text, user_id } = command;
-    channel = channel_id;
+    const { text, user_id } = command;
+    const { user, access_token } = context;
 
     const [email] = text.split(' ');
     if (!EMAIL_REGEX.test(email)) {
       await client.chat.postMessage({
-        channel,
+        channel: user_id,
         text: 'This e-mail address is invalid',
       });
 
       return;
     }
 
-    const workspace = await Workspace.findOne({ id: workspace_id });
-    if (!workspace?.client_id || !workspace?.client_secret) {
-      await client.chat.postMessage({
-        channel,
-        text: 'Please setup Client ID and Client Token',
-      });
-
-      return;
-    }
-
-    const user = await User.findOne({ uuid: user_id });
     if (!user) {
       await client.chat.postMessage({
-        channel,
+        channel: user_id,
         text: 'Please create a wallet first',
       });
 
       return;
     } else {
-      const { access_token } = await thx.getAccessToken(workspace.client_id, workspace.client_secret);
       if (!access_token) {
         await client.chat.postMessage({
-          channel,
+          channel: user_id,
           text: 'Invalid Client ID or Client Token, please setup again',
         });
 
         return;
       }
 
-      const channelModel = await Channel.findOne({
-        id: channel,
-      });
-
-      if (!channelModel?.pool_address) {
-        await client.chat.postMessage({
-          channel: channel_id,
-          text: 'Please setup Contract Address for your Channel first',
-        });
-
-        return;
-      }
-
       const res = await thx.getAuthenticationToken(
-        channelModel.pool_address,
+        context.pool_address,
         access_token,
         email,
         decryptString(user.password, SECRET),
@@ -75,7 +46,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
 
       if (!res) {
         await client.chat.postMessage({
-          channel: channel_id,
+          channel: user_id,
           text: 'Failed sending your one-time login link.',
         });
 
@@ -83,17 +54,15 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
       }
 
       await client.chat.postMessage({
-        channel: channel_id,
+        channel: user_id,
         text: 'Your one-time login has been sent!. Valid for 10 minutes. Go to your e-mail and get access to your rewards.',
       });
     }
   } catch (error) {
-    if (channel) {
-      await client.chat.postMessage({
-        channel,
-        text: 'Failed to link wallet',
-      });
-    }
+    await client.chat.postMessage({
+      channel: command.user_id,
+      text: 'Failed to link wallet',
+    });
   }
 };
 

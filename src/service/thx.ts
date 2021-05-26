@@ -1,7 +1,7 @@
 import { createClient, getClientWithAccess } from './utils';
 import Workspace from '../models/workspace';
 
-const isExpired = (time: number) => time - new Date().getTime() > 0;
+const isExpired = (time: number) => time - new Date().getTime() < 0;
 
 export default {
   // TODO: query db for access_token, if expired fetch new token and add
@@ -53,7 +53,7 @@ export default {
     const axios = getClientWithAccess(access_token);
 
     try {
-      await axios({
+      const response = await axios({
         method: 'GET',
         url: `https://api.thx.network/v1/asset_pools/${contract_address}`,
         headers: {
@@ -61,7 +61,7 @@ export default {
         },
       });
       return true;
-    } catch {
+    } catch (error) {
       return false;
     }
   },
@@ -108,7 +108,8 @@ export default {
       }
 
       return response.data.address;
-    } catch {
+    } catch (error) {
+      console.log(error);
       return;
     }
   },
@@ -191,4 +192,35 @@ export default {
       return;
     }
   },
+
+  async giveReward(pool_address: string, access_token: string, reward_id: string, user_address: string) {
+    const axios = getClientWithAccess(access_token);
+    const data = new URLSearchParams()
+    data.append('member', user_address);
+
+    const res = await axios({
+      method: 'POST',
+      url: `https://api.thx.network/v1/rewards/${reward_id}/give`,
+      headers: {
+        AssetPool: pool_address
+      },
+      data
+    })
+
+    return res.data;
+  },
+
+  async withdraw(pool_address: string, access_token: string, withdrawal: string) {
+    const axios = getClientWithAccess(access_token);
+
+    const res = await axios({
+      method: 'POST',
+      url: `https://api.thx.network/v1/withdrawals/${withdrawal}/withdraw`,
+      headers: {
+        AssetPool: pool_address
+      }
+    });
+
+    return res.data;
+  }
 };

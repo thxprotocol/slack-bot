@@ -45,6 +45,7 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
     }
 
     const isValid = await thx.checkAssetPool(contract_address, access_token);
+    console.log(isValid, access_token);
     if (!isValid) {
       await client.chat.postMessage({
         channel: channel_id,

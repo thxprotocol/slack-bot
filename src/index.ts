@@ -16,7 +16,10 @@ import walletLoginCommand from './commands/wallet/login';
 import walletUpdateCommand from './commands/wallet/update';
 import walletInfoCommand from './commands/wallet/info';
 import isAdmin from './middleware/isAdmin';
-import isWorkspaceSetup from './middleware/isWorkspaceSetup';
+import setCredentials from './middleware/setCredentials';
+import setPoolAddress from './middleware/setPoolAddress';
+import reactionAddedEvent from './events/reactionAdded';
+import setUser from './middleware/setUser';
 
 setupDb();
 
@@ -33,10 +36,13 @@ customMiddleware.enableAll(app);
 app.command(setupWorkspaceCommand.name, isAdmin, setupWorkspaceCommand.listener);
 app.command(setupAssetPoolCommand.name, isAdmin, setupAssetPoolCommand.listener);
 app.command(emojiAddCommand.name, isAdmin, emojiAddCommand.listener);
-app.command(walletCreateCommand.name, isWorkspaceSetup, walletCreateCommand.listener);
+app.command(walletCreateCommand.name, setCredentials, setPoolAddress, setUser, walletCreateCommand.listener);
 app.command(walletUpdateCommand.name, walletUpdateCommand.listener);
-app.command(walletLoginCommand.name, walletLoginCommand.listener);
-app.command(walletInfoCommand.name, walletInfoCommand.listener);
+app.command(walletLoginCommand.name, setCredentials, setPoolAddress, walletLoginCommand.listener);
+app.command(walletInfoCommand.name, setCredentials, setPoolAddress, walletInfoCommand.listener);
+
+// events
+app.event('reaction_added', reactionAddedEvent);
 
 // views
 app.view(setupWorkspaceView.name, setupWorkspaceView.listener);

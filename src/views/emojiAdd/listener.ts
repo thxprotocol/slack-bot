@@ -5,10 +5,11 @@ import Reaction from '../../models/reaction';
 import thx from '../../service/thx';
 import { EMOJI_REGEX } from '../../constants';
 
-const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client }) => {
+const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client, context }) => {
   let channel_id;
   try {
     await ack();
+    console.log(context)
 
     const private_metadata = JSON.parse(view.private_metadata);
     channel_id = private_metadata.channel_id;
@@ -42,7 +43,7 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
     const workspace = await Workspace.findOne({
       id: workspace_id,
     });
-    if (!workspace?.client_id || workspace?.client_secret) {
+    if (!workspace?.client_id || !workspace?.client_secret) {
       await client.chat.postMessage({
         channel: channel_id,
         text: 'Please setup Client ID and Client Token for your Workspace first',
@@ -79,6 +80,7 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
       text: 'Successfully linked a reward to this reaction',
     });
   } catch (error) {
+    console.log(error)
     await client.chat.postMessage({
       channel: channel_id,
       text: 'Failed to add emoji',

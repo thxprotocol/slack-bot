@@ -1,7 +1,7 @@
 import { Middleware, SlackCommandMiddlewareArgs } from '@slack/bolt';
 import Workspace from '../models/workspace';
 
-const isWorkspaceSetup: Middleware<SlackCommandMiddlewareArgs> = async ({ command, client, context, next }) => {
+const setCredentials: Middleware<SlackCommandMiddlewareArgs> = async ({ command, client, context, next }) => {
   const { channel_id, team_id: workspace_id } = command;
 
   const workspace = await Workspace.findOne({ id: workspace_id });
@@ -20,4 +20,4 @@ const isWorkspaceSetup: Middleware<SlackCommandMiddlewareArgs> = async ({ comman
   if (next) await next();
 };
 
-export default isWorkspaceSetup;
+export default setCredentials;
