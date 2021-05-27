@@ -7,8 +7,8 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
   try {
     await ack();
 
-    const { text, user_id, context } = command;
-    const { user, access_token } = context
+    const { text, user_id } = command;
+    const { user, access_token, pool_address } = context;
 
     const [public_address] = text.split(' ');
     if (!WALLET_REGEX.test(public_address)) {
@@ -23,7 +23,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
     if (!user) {
       await User.create({ uuid: user_id, public_address });
     } else {
-      await user.updateOne({ public_address: public_address });
+      await user.updateOne({ public_address });
     }
 
     if (!access_token) {
@@ -35,7 +35,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
       return;
     }
 
-    await thx.addMember(access_token, context.pool_address, public_address);
+    await thx.addMember(access_token, pool_address, public_address);
 
     await client.chat.postMessage({
       channel: user_id,

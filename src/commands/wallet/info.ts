@@ -6,7 +6,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
     await ack();
 
     const { user_id } = command;
-    const { user, access_token } = context
+    const { user, access_token } = context;
 
     if (!user) {
       await client.chat.postMessage({

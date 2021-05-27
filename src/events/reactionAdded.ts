@@ -13,63 +13,51 @@ const listener: Middleware<SlackEventMiddlewareArgs<'reaction_added'>> = async (
     if (user !== item_user) {
       if (item.type === 'message') {
         const channel = await Channel.findOne({
-          id: item.channel
-        },);
+          id: item.channel,
+        });
 
-        if (!channel) return
+        if (!channel) return;
 
         const reactions = await Reaction.find({ channel });
-        
-        const reward = reactions.find(reaction => reaction.reaction_id === `:${event_reaction}:`);
-        if (!reward) return
+
+        const reward = reactions.find((reaction) => reaction.reaction_id === `:${event_reaction}:`);
+        if (!reward) return;
 
         const workspace = await Workspace.findOne({
-          id: body.team_id
-        })
-        if (!workspace) return
+          id: body.team_id,
+        });
+        if (!workspace) return;
 
         const persistedUser = await User.findOne({
-          uuid: item_user
+          uuid: item_user,
         });
-        if (!persistedUser || !persistedUser.public_address) return
+        if (!persistedUser || !persistedUser.public_address) return;
 
         const cachedReaction = await ReactionCache.findOne({
           uuid: item_user,
           reactionId: event_reaction,
           messageId: item.ts,
-        })
-        if (cachedReaction) return
+        });
+        if (cachedReaction) return;
 
-        const { access_token } = await thx.getAccessToken(
-          workspace.client_id,
-          workspace.client_secret,
-        );
+        const { access_token } = await thx.getAccessToken(workspace.client_id, workspace.client_secret);
 
         const giveRewardResponse = await thx.giveReward(
           channel.pool_address,
           access_token,
           reward.reward_id,
-          persistedUser.public_address
+          persistedUser.public_address,
         );
 
-        await thx.withdraw(
-          channel.pool_address, 
-          access_token, 
-          giveRewardResponse.withdrawal
-        )
+        await thx.withdraw(channel.pool_address, access_token, giveRewardResponse.withdrawal);
 
         const contract_link = buildWalletUrl(channel.pool_address);
 
         await ReactionCache.create({
           uuid: item_user,
           reactionId: event_reaction,
-          messageId: item.ts
+          messageId: item.ts,
         });
-
-        await client.chat.postMessage({
-          channel: item.channel,
-          text: 'You got a new reward'
-        })
 
         await client.chat.postMessage({
           channel: item_user,
@@ -81,7 +69,7 @@ const listener: Middleware<SlackEventMiddlewareArgs<'reaction_added'>> = async (
     if (event.item.type == 'message') {
       await client.chat.postMessage({
         channel: event.item.channel,
-        text: 'Failed to reward user'
+        text: 'Failed to reward user',
       });
     }
   }

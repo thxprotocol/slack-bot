@@ -9,7 +9,7 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
   let channel_id;
   try {
     await ack();
-    console.log(context)
+    console.log(context.h);
 
     const private_metadata = JSON.parse(view.private_metadata);
     channel_id = private_metadata.channel_id;
@@ -80,7 +80,7 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
       text: 'Successfully linked a reward to this reaction',
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     await client.chat.postMessage({
       channel: channel_id,
       text: 'Failed to add emoji',

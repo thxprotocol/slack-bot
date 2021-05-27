@@ -1,7 +1,7 @@
 import { Middleware, SlackCommandMiddlewareArgs } from '@slack/bolt';
 import User from '../models/user';
 
-const setUser: Middleware<SlackCommandMiddlewareArgs> = async ({ command, next, context }) => {
+const addUserContext: Middleware<SlackCommandMiddlewareArgs> = async ({ command, next, context }) => {
   const { user_id } = command;
 
   const user = await User.findOne({ uuid: user_id });
@@ -11,4 +11,4 @@ const setUser: Middleware<SlackCommandMiddlewareArgs> = async ({ command, next, 
   if (next) await next();
 };
 
-export default setUser;
+export default addUserContext;

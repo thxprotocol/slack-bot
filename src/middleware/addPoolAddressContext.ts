@@ -1,7 +1,7 @@
 import { Middleware, SlackCommandMiddlewareArgs } from '@slack/bolt';
 import Channel from '../models/channel';
 
-const setPoolAddress: Middleware<SlackCommandMiddlewareArgs> = async ({ command, client, context, next }) => {
+const addPoolAddressContext: Middleware<SlackCommandMiddlewareArgs> = async ({ command, client, context, next }) => {
   const { channel_id } = command;
 
   const channel = await Channel.findOne({
@@ -22,4 +22,4 @@ const setPoolAddress: Middleware<SlackCommandMiddlewareArgs> = async ({ command,
   if (next) await next();
 };
 
-export default setPoolAddress;
+export default addPoolAddressContext;

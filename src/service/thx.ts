@@ -195,17 +195,17 @@ export default {
 
   async giveReward(pool_address: string, access_token: string, reward_id: string, user_address: string) {
     const axios = getClientWithAccess(access_token);
-    const data = new URLSearchParams()
+    const data = new URLSearchParams();
     data.append('member', user_address);
 
     const res = await axios({
       method: 'POST',
       url: `https://api.thx.network/v1/rewards/${reward_id}/give`,
       headers: {
-        AssetPool: pool_address
+        AssetPool: pool_address,
       },
-      data
-    })
+      data,
+    });
 
     return res.data;
   },
@@ -217,10 +217,10 @@ export default {
       method: 'POST',
       url: `https://api.thx.network/v1/withdrawals/${withdrawal}/withdraw`,
       headers: {
-        AssetPool: pool_address
-      }
+        AssetPool: pool_address,
+      },
     });
 
     return res.data;
-  }
+  },
 };
