@@ -1,2 +1,2 @@
 #!/bin/bash
-pm2 reload bot-slack --update-env
+pm2 reload ecosystem.config.js --env production --update-env
