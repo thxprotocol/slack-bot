@@ -1,2 +1,2 @@
 #!/bin/bash
-pm2 reload bot-slack --env production --update-env
+pm2 reload bot-slack --update-env
