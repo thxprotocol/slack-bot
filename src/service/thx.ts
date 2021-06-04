@@ -224,3 +224,32 @@ export default {
     return res.data;
   },
 };
+
+export const getWalletAddress = async (pool_address: string, access_token: string, email: string, password: string) => {
+  try {
+    const axios = getClientWithAccess(access_token);
+
+    const data = new URLSearchParams();
+    data.append('email', email);
+    data.append('password', password);
+    data.append('confirmPassword', password);
+
+    const response = await axios({
+      method: 'POST',
+      url: 'https://api.thx.network/v1/signup',
+      headers: {
+        AssetPool: pool_address,
+      },
+      data,
+    });
+
+    if (response.status !== 201) {
+      return;
+    }
+
+    return response.data.address;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+};
