@@ -20,6 +20,7 @@ import addCredentialsContext from './middleware/addCredentialsContext';
 import addPoolAddressContext from './middleware/addPoolAddressContext';
 import reactionAddedEvent from './events/reactionAdded';
 import addUserContext from './middleware/addUserContext';
+import help from './commands/help';
 
 setupDb();
 
@@ -33,6 +34,7 @@ const app = new App({
 customMiddleware.enableAll(app);
 
 // commands
+app.command(help.name, help.listener);
 app.command(setupWorkspaceCommand.name, isAdmin, setupWorkspaceCommand.listener);
 app.command(setupAssetPoolCommand.name, isAdmin, setupAssetPoolCommand.listener);
 app.command(emojiAddCommand.name, isAdmin, emojiAddCommand.listener);
