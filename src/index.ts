@@ -58,6 +58,7 @@ app.command(
   addCredentialsContext,
   addAccessTokenContext,
   addPoolAddressContext,
+  addUserContext,
   walletLoginCommand.listener,
 );
 app.command(
@@ -65,6 +66,7 @@ app.command(
   addCredentialsContext,
   addAccessTokenContext,
   addPoolAddressContext,
+  addUserContext,
   walletInfoCommand.listener,
 );
 
