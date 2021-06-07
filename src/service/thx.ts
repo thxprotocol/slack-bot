@@ -4,7 +4,6 @@ import Workspace from '../models/workspace';
 const isExpired = (time: number) => time - new Date().getTime() < 0;
 
 export default {
-  // TODO: query db for access_token, if expired fetch new token and add
   async getAccessToken(
     clientId: string,
     clientToken: string,
@@ -223,33 +222,4 @@ export default {
 
     return res.data;
   },
-};
-
-export const getWalletAddress = async (pool_address: string, access_token: string, email: string, password: string) => {
-  try {
-    const axios = getClientWithAccess(access_token);
-
-    const data = new URLSearchParams();
-    data.append('email', email);
-    data.append('password', password);
-    data.append('confirmPassword', password);
-
-    const response = await axios({
-      method: 'POST',
-      url: 'https://api.thx.network/v1/signup',
-      headers: {
-        AssetPool: pool_address,
-      },
-      data,
-    });
-
-    if (response.status !== 201) {
-      return;
-    }
-
-    return response.data.address;
-  } catch (error) {
-    console.log(error);
-    return;
-  }
 };
