@@ -50,6 +50,7 @@ app.command(
   walletUpdateCommand.name,
   addCredentialsContext,
   addAccessTokenContext,
+  addPoolAddressContext,
   addUserContext,
   walletUpdateCommand.listener,
 );
