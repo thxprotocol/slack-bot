@@ -45,7 +45,6 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
     }
 
     const isValid = await thx.checkAssetPool(contract_address, access_token);
-    console.log(isValid, access_token);
     if (!isValid) {
       await client.chat.postMessage({
         channel: channel_id,
@@ -69,6 +68,7 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
       text: 'Successfully update asset pool for this channel',
     });
   } catch (error) {
+    console.error(error);
     await client.chat.postMessage({
       channel: channel_id,
       text: 'Invalid contract address',

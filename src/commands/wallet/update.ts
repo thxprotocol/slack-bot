@@ -42,6 +42,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
       text: 'Successfully linked your wallet',
     });
   } catch (error) {
+    console.error(error);
     await client.chat.postMessage({
       channel: command.user_id,
       text: 'Failed to link wallet',

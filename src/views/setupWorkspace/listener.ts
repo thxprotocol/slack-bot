@@ -18,7 +18,12 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
 
     const { access_token, access_token_expires_at } = await thx.getAccessToken(client_id, client_secret);
     if (!access_token) {
-      throw new Error('Invalid credentials');
+      await client.chat.postMessage({
+        channel: channel_id,
+        text: 'Failed to setup Client Id and Token for your workspace',
+      });
+
+      return;
     }
 
     const workspace = await Workspace.findOneAndUpdate(
@@ -40,10 +45,11 @@ const listener: Middleware<SlackViewMiddlewareArgs> = async ({ ack, view, client
       text: 'Successfully setup Client Id and Token for your workspace',
     });
   } catch (error) {
+    console.error(error);
     if (channel_id) {
       await client.chat.postMessage({
         channel: channel_id,
-        text: error.message || 'Failed to setup Client Id and Token for your workspace',
+        text: 'Failed to setup Client Id and Token for your workspace',
       });
     }
   }

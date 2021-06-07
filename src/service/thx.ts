@@ -4,7 +4,6 @@ import Workspace from '../models/workspace';
 const isExpired = (time: number) => time - new Date().getTime() < 0;
 
 export default {
-  // TODO: query db for access_token, if expired fetch new token and add
   async getAccessToken(
     clientId: string,
     clientToken: string,
