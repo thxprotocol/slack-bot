@@ -16,29 +16,74 @@ const listener: Middleware<SlackEventMiddlewareArgs<'reaction_added'>> = async (
           id: item.channel,
         });
 
-        if (!channel) return;
+        if (!channel) {
+          if (event.item.type == 'message') {
+            await client.chat.postMessage({
+              channel: user,
+              text: 'Please set up channel',
+            });
+          }
+
+          return;
+        }
 
         const reactions = await Reaction.find({ channel });
 
         const reward = reactions.find((reaction) => reaction.reaction_id === `:${event_reaction}:`);
-        if (!reward) return;
+        if (!reward) {
+          if (event.item.type == 'message') {
+            await client.chat.postMessage({
+              channel: user,
+              text: 'No reward supported for reaction',
+            });
+          }
+
+          return;
+        }
 
         const workspace = await Workspace.findOne({
           id: body.team_id,
         });
-        if (!workspace) return;
+        if (!workspace) {
+          if (event.item.type == 'message') {
+            await client.chat.postMessage({
+              channel: user,
+              text: 'Please set up workspace',
+            });
+          }
+
+          return;
+        }
 
         const persistedUser = await User.findOne({
           uuid: item_user,
         });
-        if (!persistedUser || !persistedUser.public_address) return;
+        if (!persistedUser || !persistedUser.public_address) {
+          if (event.item.type == 'message') {
+            await client.chat.postMessage({
+              channel: user,
+              text: 'Please set up user',
+            });
+          }
+
+          return;
+        }
 
         const cachedReaction = await ReactionCache.findOne({
-          uuid: item_user,
+          uuid: user,
           reactionId: event_reaction,
           messageId: item.ts,
         });
-        if (cachedReaction) return;
+        if (cachedReaction) {
+          if (event.item.type == 'message') {
+            await client.chat.postMessage({
+              channel: user,
+              text: 'You have already reacted',
+            });
+          }
+
+          return;
+        }
 
         const { access_token } = await thx.getAccessToken(workspace.client_id, workspace.client_secret);
 
@@ -68,7 +113,7 @@ const listener: Middleware<SlackEventMiddlewareArgs<'reaction_added'>> = async (
   } catch (e) {
     if (event.item.type == 'message') {
       await client.chat.postMessage({
-        channel: event.item.channel,
+        channel: event.user,
         text: 'Failed to reward user',
       });
     }
