@@ -21,6 +21,7 @@ import addPoolAddressContext from './middleware/addPoolAddressContext';
 import reactionAddedEvent from './events/reactionAdded';
 import addUserContext from './middleware/addUserContext';
 import help from './commands/help';
+import addAccessTokenContext from './middleware/addAccessTokenContext';
 
 setupDb();
 
@@ -45,9 +46,27 @@ app.command(
   addUserContext,
   walletCreateCommand.listener,
 );
-app.command(walletUpdateCommand.name, addCredentialsContext, addUserContext, walletUpdateCommand.listener);
-app.command(walletLoginCommand.name, addCredentialsContext, addPoolAddressContext, walletLoginCommand.listener);
-app.command(walletInfoCommand.name, addCredentialsContext, addPoolAddressContext, walletInfoCommand.listener);
+app.command(
+  walletUpdateCommand.name,
+  addCredentialsContext,
+  addAccessTokenContext,
+  addUserContext,
+  walletUpdateCommand.listener,
+);
+app.command(
+  walletLoginCommand.name,
+  addCredentialsContext,
+  addAccessTokenContext,
+  addPoolAddressContext,
+  walletLoginCommand.listener,
+);
+app.command(
+  walletInfoCommand.name,
+  addCredentialsContext,
+  addAccessTokenContext,
+  addPoolAddressContext,
+  walletInfoCommand.listener,
+);
 
 // events
 app.event('reaction_added', reactionAddedEvent);
