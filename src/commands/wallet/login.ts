@@ -1,14 +1,14 @@
 import { Middleware, SlackCommandMiddlewareArgs } from '@slack/bolt';
 import { EMAIL_REGEX, SECRET } from '../../constants';
 import thx from '../../service/thx';
-import { decryptString } from '../../utils/crypto';
+import { decryptString, encryptString } from '../../utils/crypto';
 
 const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, client, context }) => {
   try {
     await ack();
 
     const { text, user_id } = command;
-    const { user, access_token } = context;
+    const { user, access_token, pool_address } = context;
 
     const [email] = text.split(' ');
     if (!EMAIL_REGEX.test(email)) {
@@ -38,7 +38,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
       }
 
       const res = await thx.getAuthenticationToken(
-        context.pool_address,
+        pool_address,
         access_token,
         email,
         decryptString(user.password, SECRET),
@@ -59,6 +59,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
       });
     }
   } catch (error) {
+    console.error(error);
     await client.chat.postMessage({
       channel: command.user_id,
       text: 'Failed to link wallet',

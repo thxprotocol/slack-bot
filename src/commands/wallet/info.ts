@@ -42,6 +42,7 @@ const listener: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, command, 
       });
     }
   } catch (error) {
+    console.error(error);
     await client.chat.postMessage({
       channel: command.user_id,
       text: 'Failed to fetch wallet info',
