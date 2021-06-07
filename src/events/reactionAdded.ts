@@ -8,6 +8,7 @@ import thx from '../service/thx';
 import { buildWalletUrl } from '../utils';
 
 const listener: Middleware<SlackEventMiddlewareArgs<'reaction_added'>> = async ({ event, context, client, body }) => {
+  console.log('reaction_added event listerner executed');
   try {
     const { user, item_user, item, reaction: event_reaction } = event;
     if (user !== item_user) {
